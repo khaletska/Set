@@ -37,6 +37,7 @@ final class SetGame {
     }
 
     func touchCard(index: Int) {
+        updateSelectedState(for: index)
         if self.chosenCardsIndices.count == 3, matchCards() {
             self.matchedCardsIndices.append(contentsOf: self.chosenCardsIndices)
             self.shownCards.remove(atOffsets: IndexSet(self.chosenCardsIndices))
