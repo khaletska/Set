@@ -49,7 +49,7 @@ final class ViewController: UIViewController {
             if let card = self.game.getCard(for: index) {
                 button.configuration?.background.strokeColor = self.game.isCardChosen(at: index) ? .orange : .clear
                 button.isHidden = false
-                button.setTitle(card.content, for: .normal)
+                button.setAttributedTitle(card.content, for: .normal)
             }
             else {
                 button.isHidden = true

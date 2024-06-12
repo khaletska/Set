@@ -7,12 +7,6 @@
 
 import Foundation
 
-struct Card {
-
-    let content = "💩"
-
-}
-
 final class SetGame {
 
     var canDrawCards: Bool {
@@ -24,7 +18,7 @@ final class SetGame {
     private var matchedCardsIndices: Array<Int>
 
     init() {
-        self.deck = Array(repeating: Card(), count: 81)
+        self.deck = Deck().deck
         self.shownCards = []
         self.chosenCardsIndices = []
         self.matchedCardsIndices = []
@@ -68,16 +62,36 @@ final class SetGame {
     }
 
     private func updateSelectedState(for cardIndex: Int) {
-        if self.chosenCardsIndices.contains(index) {
-            chosenCardsIndices.removeAll { $0 == index }
+        if self.chosenCardsIndices.contains(cardIndex) {
+            chosenCardsIndices.removeAll { $0 == cardIndex }
         }
         else {
-            self.chosenCardsIndices.append(index)
+            self.chosenCardsIndices.append(cardIndex)
         }
     }
 
     private func matchCards() -> Bool {
-        return true
+        guard self.chosenCardsIndices.count == 3 else {
+            return false
+        }
+
+        let card1 = self.shownCards[chosenCardsIndices[0]]
+        let card2 = self.shownCards[chosenCardsIndices[1]]
+        let card3 = self.shownCards[chosenCardsIndices[2]]
+
+        let numberCondition = isMatching(card1.number, card2.number, card3.number)
+        let shapeCondition = isMatching(card1.shape, card2.shape, card3.shape)
+        let shadingCondition = isMatching(card1.shade, card2.shade, card3.shade)
+        let colorCondition = isMatching(card1.color, card2.color, card3.color)
+
+        return numberCondition && shapeCondition && shadingCondition && colorCondition
+    }
+
+    private func isMatching<T: Equatable>(_ a: T, _ b: T, _ c: T) -> Bool {
+        let equalCondition = a == b && a == c
+        let differentCondition = a != b && b != c && a != c
+
+        return equalCondition || differentCondition
     }
 
 }
