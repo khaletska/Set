@@ -8,54 +8,14 @@
 import Foundation
 import UIKit
 
-enum Color: CaseIterable {
-    case red, green, blue
-
-    var uicolor: UIColor {
-        switch self {
-        case .red: 
-            return .red
-        case .green: 
-            return .green
-        case .blue: 
-            return .blue
-        }
-    }
-}
-
-enum Shade: CaseIterable {
-    case open, striped, solid
-
-    var alpha: CGFloat {
-        switch self {
-        case .open:
-            return 0.0
-        case .striped:
-            return 0.15
-        case .solid:
-            return 1.0
-        }
-    }
-}
-
-enum Shape: String, CaseIterable {
-    case triangle = "▲"
-    case circle = "●"
-    case square = "■"
-}
-
-enum Number: Int, CaseIterable {
-    case one = 1, two, three
-}
-
 struct Card {
-    let color: Color
-    let shade: Shade
-    let shape: Shape
-    let number: Number
+    let color: Card.Color
+    let shade: Card.Shade
+    let shape: Card.Shape
+    let number: Card.Number
     let content: NSAttributedString
 
-    init(color: Color, shade: Shade, shape: Shape, number: Number) {
+    init(color: Card.Color, shade: Card.Shade, shape: Card.Shape, number: Card.Number) {
         self.color = color
         self.shade = shade
         self.shape = shape
@@ -73,4 +33,45 @@ struct Card {
         let string = String(repeating: shape.rawValue, count: number.rawValue)
         self.content = NSAttributedString(string: string, attributes: attributes)
     }
+
+    enum Color: CaseIterable, Hashable {
+        case red, green, blue
+
+        var uicolor: UIColor {
+            switch self {
+            case .red:
+                return .red
+            case .green:
+                return .green
+            case .blue:
+                return .blue
+            }
+        }
+    }
+
+    enum Shade: CaseIterable, Hashable {
+        case open, striped, solid
+
+        var alpha: CGFloat {
+            switch self {
+            case .open:
+                return 0.0
+            case .striped:
+                return 0.15
+            case .solid:
+                return 1.0
+            }
+        }
+    }
+
+    enum Shape: String, CaseIterable, Hashable {
+        case triangle = "▲"
+        case circle = "●"
+        case square = "■"
+    }
+
+    enum Number: Int, CaseIterable, Hashable {
+        case one = 1, two, three
+    }
+
 }

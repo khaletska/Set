@@ -12,16 +12,16 @@ final class SetGame {
     var canDrawCards: Bool {
         self.shownCards.count < 24
     }
-    private var deck: Array<Card>
+    private var deck = Array<Card>()
     private var shownCards: Array<Card>
     private var chosenCardsIndices: Array<Int>
     private var matchedCardsIndices: Array<Int>
 
     init() {
-        self.deck = Deck().deck
         self.shownCards = []
         self.chosenCardsIndices = []
         self.matchedCardsIndices = []
+        generateDeck()
     }
 
     func drawCards(_ amount: Int) {
@@ -52,6 +52,20 @@ final class SetGame {
         return chosenCardsIndices.firstIndex(of: index) != nil
     }
 
+    private func generateDeck() {
+        for color in Card.Color.allCases {
+            for shade in Card.Shade.allCases {
+                for shape in Card.Shape.allCases {
+                    for number in Card.Number.allCases {
+                        self.deck.append(Card(color: color, shade: shade, shape: shape, number: number))
+                    }
+                }
+            }
+        }
+
+        self.deck.shuffle()
+    }
+
     private func drawOneCard() {
         guard let lastCard = self.deck.popLast() else {
             assertionFailure("not implemented")
@@ -71,25 +85,28 @@ final class SetGame {
     }
 
     private func matchCards() -> Bool {
-        guard self.chosenCardsIndices.count == 3 else {
+        guard self.chosenCardsIndices.count > 2 else {
             return false
         }
 
-        let card1 = self.shownCards[chosenCardsIndices[0]]
-        let card2 = self.shownCards[chosenCardsIndices[1]]
-        let card3 = self.shownCards[chosenCardsIndices[2]]
+        let cards = self.chosenCardsIndices.map { self.shownCards[$0] }
 
-        let numberCondition = isMatching(card1.number, card2.number, card3.number)
-        let shapeCondition = isMatching(card1.shape, card2.shape, card3.shape)
-        let shadingCondition = isMatching(card1.shade, card2.shade, card3.shade)
-        let colorCondition = isMatching(card1.color, card2.color, card3.color)
+        let cardsNumbers = cards.map { $0.number }
+        let cardsShapes = cards.map { $0.shape }
+        let cardsShades = cards.map { $0.shade }
+        let cardsColors = cards.map { $0.color }
 
-        return numberCondition && shapeCondition && shadingCondition && colorCondition
+        let numberCondition = isMatching(cardsNumbers)
+        let shapeCondition = isMatching(cardsShapes)
+        let shadeCondition = isMatching(cardsShades)
+        let colorCondition = isMatching(cardsColors)
+
+        return numberCondition && shapeCondition && shadeCondition && colorCondition
     }
 
-    private func isMatching<T: Equatable>(_ a: T, _ b: T, _ c: T) -> Bool {
-        let equalCondition = a == b && a == c
-        let differentCondition = a != b && b != c && a != c
+    private func isMatching<T: Hashable>(_ values: [T]) -> Bool {
+        let equalCondition = values.dropFirst().allSatisfy { $0 == values.first }
+        let differentCondition = Set(values).count == values.count
 
         return equalCondition || differentCondition
     }
