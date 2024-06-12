@@ -15,13 +15,13 @@ struct Card {
 
 final class SetGame {
 
+    var canDrawCards: Bool {
+        self.shownCards.count < 24
+    }
     private var deck: Array<Card>
     private var shownCards: Array<Card>
     private var chosenCardsIndices: Array<Int>
     private var matchedCardsIndices: Array<Int>
-    var canDrawCards: Bool {
-        self.shownCards.count < 24
-    }
 
     init() {
         self.deck = Array(repeating: Card(), count: 81)
@@ -36,34 +36,13 @@ final class SetGame {
         }
     }
 
-    private func drawOneCard() {
-        guard let lastCard = self.deck.popLast() else {
-            assertionFailure("not implemented")
-            return
-        }
-
-        self.shownCards.append(lastCard)
-    }
-
     func touchCard(index: Int) {
-        if self.chosenCardsIndices.contains(index) {
-            chosenCardsIndices.removeAll { $0 == index }
+        if self.chosenCardsIndices.count == 3, matchCards() {
+            self.matchedCardsIndices.append(contentsOf: self.chosenCardsIndices)
+            self.shownCards.remove(atOffsets: IndexSet(self.chosenCardsIndices))
+            self.chosenCardsIndices = []
+            drawCards(3)
         }
-        else {
-            self.chosenCardsIndices.append(index)
-            if self.chosenCardsIndices.count == 3 {
-                if matchCards() {
-                    self.matchedCardsIndices.append(contentsOf: self.chosenCardsIndices)
-                    self.shownCards.remove(atOffsets: IndexSet(self.chosenCardsIndices))
-                    self.chosenCardsIndices = []
-                    drawCards(3)
-                }
-            }
-        }
-    }
-
-    private func matchCards() -> Bool {
-        return true
     }
 
     func getCard(for index: Int) -> Card? {
@@ -76,6 +55,28 @@ final class SetGame {
 
     func isCardChosen(at index: Int) -> Bool {
         return chosenCardsIndices.firstIndex(of: index) != nil
+    }
+
+    private func drawOneCard() {
+        guard let lastCard = self.deck.popLast() else {
+            assertionFailure("not implemented")
+            return
+        }
+
+        self.shownCards.append(lastCard)
+    }
+
+    private func updateSelectedState(for cardIndex: Int) {
+        if self.chosenCardsIndices.contains(index) {
+            chosenCardsIndices.removeAll { $0 == index }
+        }
+        else {
+            self.chosenCardsIndices.append(index)
+        }
+    }
+
+    private func matchCards() -> Bool {
+        return true
     }
 
 }

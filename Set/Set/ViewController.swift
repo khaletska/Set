@@ -10,11 +10,11 @@ import UIKit
 final class ViewController: UIViewController {
 
     private var game: SetGame!
-    @IBOutlet var cardButtons: [UIButton]!
-    @IBOutlet weak var drawThreeMoreCardsButton: UIButton!
-    @IBOutlet weak var newGameButton: UIButton!
+    @IBOutlet private var cardButtons: [UIButton]!
+    @IBOutlet private weak var drawThreeMoreCardsButton: UIButton!
+    @IBOutlet private weak var newGameButton: UIButton!
 
-    override func viewDidLoad() {
+    override internal func viewDidLoad() {
         super.viewDidLoad()
 
         startNewGame()
