@@ -8,10 +8,10 @@
 import Foundation
 
 struct Card {
-    let color: Card.Color
-    let shade: Card.Shade
-    let shape: Card.Shape
-    let number: Card.Number
+    let color: Color
+    let shade: Shade
+    let shape: Shape
+    let number: Number
 
     enum Color: CaseIterable, Hashable {
         case red, green, purple
