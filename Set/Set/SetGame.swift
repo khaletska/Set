@@ -7,27 +7,21 @@
 
 import Foundation
 
-struct Card {
-
-    let content = "💩"
-
-}
-
 final class SetGame {
 
     var canDrawCards: Bool {
         self.shownCards.count < 24
     }
-    private var deck: Array<Card>
+    private var deck = Array<Card>()
     private var shownCards: Array<Card>
     private var chosenCardsIndices: Array<Int>
     private var matchedCardsIndices: Array<Int>
 
     init() {
-        self.deck = Array(repeating: Card(), count: 81)
         self.shownCards = []
         self.chosenCardsIndices = []
         self.matchedCardsIndices = []
+        generateDeck()
     }
 
     func drawCards(_ amount: Int) {
@@ -58,6 +52,20 @@ final class SetGame {
         return chosenCardsIndices.firstIndex(of: index) != nil
     }
 
+    private func generateDeck() {
+        for color in Card.Color.allCases {
+            for shade in Card.Shade.allCases {
+                for shape in Card.Shape.allCases {
+                    for number in Card.Number.allCases {
+                        self.deck.append(Card(color: color, shade: shade, shape: shape, number: number))
+                    }
+                }
+            }
+        }
+
+        self.deck.shuffle()
+    }
+
     private func drawOneCard() {
         guard let lastCard = self.deck.popLast() else {
             assertionFailure("not implemented")
@@ -68,16 +76,39 @@ final class SetGame {
     }
 
     private func updateSelectedState(for cardIndex: Int) {
-        if self.chosenCardsIndices.contains(index) {
-            chosenCardsIndices.removeAll { $0 == index }
+        if self.chosenCardsIndices.contains(cardIndex) {
+            chosenCardsIndices.removeAll { $0 == cardIndex }
         }
         else {
-            self.chosenCardsIndices.append(index)
+            self.chosenCardsIndices.append(cardIndex)
         }
     }
 
     private func matchCards() -> Bool {
-        return true
+        guard self.chosenCardsIndices.count > 2 else {
+            return false
+        }
+
+        let cards = self.chosenCardsIndices.map { self.shownCards[$0] }
+
+        let cardsNumbers = cards.map { $0.number }
+        let cardsShapes = cards.map { $0.shape }
+        let cardsShades = cards.map { $0.shade }
+        let cardsColors = cards.map { $0.color }
+
+        let numberCondition = isMatching(cardsNumbers)
+        let shapeCondition = isMatching(cardsShapes)
+        let shadeCondition = isMatching(cardsShades)
+        let colorCondition = isMatching(cardsColors)
+
+        return numberCondition && shapeCondition && shadeCondition && colorCondition
+    }
+
+    private func isMatching<T: Hashable>(_ values: [T]) -> Bool {
+        let equalCondition = values.dropFirst().allSatisfy { $0 == values.first }
+        let differentCondition = Set(values).count == values.count
+
+        return equalCondition || differentCondition
     }
 
 }
