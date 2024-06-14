@@ -47,7 +47,8 @@ final class ViewController: UIViewController {
 
         for (index, button) in self.cardButtons.enumerated() {
             if let card = self.game.getCard(for: index) {
-                button.configuration?.background.strokeColor = self.game.isCardChosen(at: index) ? .orange : .clear
+                button.configuration?.background.strokeColor = getCardHighlightColor(for: index)
+                button.configuration?.background.strokeWidth = 3
                 button.isHidden = false
 
                 button.setAttributedTitle(card.buildString(), for: .normal)
@@ -55,6 +56,19 @@ final class ViewController: UIViewController {
             else {
                 button.isHidden = true
             }
+        }
+    }
+
+    private func getCardHighlightColor(for index: Int) -> UIColor {
+        switch self.game.getCardState(for: index) {
+        case .chosen:
+            return .systemOrange
+        case .matched:
+            return .systemGreen
+        case .unmatched:
+            return .systemRed
+        case .none:
+            return .clear
         }
     }
 

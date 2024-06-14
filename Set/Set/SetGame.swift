@@ -7,20 +7,27 @@
 
 import Foundation
 
+enum CardState {
+    case chosen, matched, unmatched
+}
+
 final class SetGame {
 
     var canDrawCards: Bool {
         self.shownCards.count < 24
     }
+
     private var deck = Array<Card>()
     private var shownCards: Array<Card>
     private var chosenCardsIndices: Array<Int>
     private var matchedCardsIndices: Array<Int>
+    private var unmatchedCardsIndices: Array<Int>
 
     init() {
         self.shownCards = []
         self.chosenCardsIndices = []
         self.matchedCardsIndices = []
+        self.unmatchedCardsIndices = []
         generateDeck()
     }
 
@@ -32,11 +39,21 @@ final class SetGame {
 
     func touchCard(index: Int) {
         updateSelectedState(for: index)
-        if self.chosenCardsIndices.count == 3, matchCards() {
-            self.matchedCardsIndices.append(contentsOf: self.chosenCardsIndices)
+        if self.matchedCardsIndices.count == 3 || self.unmatchedCardsIndices.count == 3 {
             self.shownCards.remove(atOffsets: IndexSet(self.chosenCardsIndices))
-            self.chosenCardsIndices = []
+            self.matchedCardsIndices = []
+            self.unmatchedCardsIndices = []
             drawCards(3)
+        }
+
+        if self.chosenCardsIndices.count == 3 {
+            if matchCards() {
+                self.matchedCardsIndices.append(contentsOf: self.chosenCardsIndices)
+            }
+            else {
+                self.unmatchedCardsIndices.append(contentsOf: self.chosenCardsIndices)
+            }
+            self.chosenCardsIndices = []
         }
     }
 
@@ -52,6 +69,23 @@ final class SetGame {
         return chosenCardsIndices.firstIndex(of: index) != nil
     }
 
+    func getCardState(for index: Int) -> CardState? {
+        if self.matchedCardsIndices.contains(index) {
+            return .matched
+        }
+        else if self.unmatchedCardsIndices.contains(index) {
+            return .unmatched
+        }
+        else if self.chosenCardsIndices.contains(index) {
+            return .chosen
+        }
+        else {
+            return .none
+        }
+    }
+
+    
+
     private func generateDeck() {
         for color in Card.Color.allCases {
             for shade in Card.Shade.allCases {
@@ -63,7 +97,7 @@ final class SetGame {
             }
         }
 
-        self.deck.shuffle()
+//        self.deck.shuffle()
     }
 
     private func drawOneCard() {
