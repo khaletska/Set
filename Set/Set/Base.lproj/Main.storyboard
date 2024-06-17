@@ -482,7 +482,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gAv-tk-1wW">
-                                <rect key="frame" x="142" y="783" width="108" height="35"/>
+                                <rect key="frame" x="250" y="783" width="108" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <state key="normal" title="Button"/>
@@ -491,6 +491,13 @@
                                     <action selector="newGameButtonTapped" destination="BYZ-38-t0r" eventType="touchUpInside" id="tvv-sF-n6z"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Score: 0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uzs-Ui-Gbp">
+                                <rect key="frame" x="35" y="790" width="158" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -498,6 +505,7 @@
                     <connections>
                         <outlet property="drawThreeMoreCardsButton" destination="YYh-iE-9Kc" id="x7b-Co-Kh1"/>
                         <outlet property="newGameButton" destination="gAv-tk-1wW" id="RRQ-Is-kBX"/>
+                        <outlet property="scoreLabel" destination="Uzs-Ui-Gbp" id="HLc-4h-yGF"/>
                         <outletCollection property="cardButtons" destination="eO9-2M-cWH" collectionClass="NSMutableArray" id="0f5-rL-PWJ"/>
                         <outletCollection property="cardButtons" destination="wTg-BW-vLl" collectionClass="NSMutableArray" id="64R-6c-OXa"/>
                         <outletCollection property="cardButtons" destination="Egm-8N-oCR" collectionClass="NSMutableArray" id="mls-Xx-Vga"/>
