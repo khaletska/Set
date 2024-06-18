@@ -16,27 +16,13 @@ final class SetGame {
     var canDrawCards: Bool {
         !self.deck.isEmpty && (findEmptySlot() != nil || self.matchedCardsIndices.count == 3)
     }
-
+    var delegate: SetGameDelegate!
     private var deck: Array<Card> = SetGame.generateDeck()
     private var shownCards: Array<Card?> = .init(repeating: nil, count: 24)
     private var chosenCardsIndices: Array<Int> = []
     private var matchedCardsIndices: Array<Int> = []
     private var unmatchedCardsIndices: Array<Int> = []
     private(set) var score: Int = 0
-
-    func dealCards(_ amount: Int) {
-        guard self.canDrawCards else {
-            assertionFailure("This case should be handled by UI")
-            return
-        }
-
-        if !self.matchedCardsIndices.isEmpty {
-            removeMatchedCards()
-        }
-
-        let cards = drawCards(amount)
-        showCards(cards)
-    }
 
     func touchCard(index: Int) {
         guard !self.matchedCardsIndices.contains(index) else {
@@ -55,6 +41,24 @@ final class SetGame {
         updateSelectedState(for: index)
         updateMatchingState(for: index)
         updateScore()
+
+        self.delegate.gameDidChange()
+    }
+
+    func dealCards(_ amount: Int) {
+        guard self.canDrawCards else {
+            assertionFailure("This case should be handled by UI")
+            return
+        }
+
+        if !self.matchedCardsIndices.isEmpty {
+            removeMatchedCards()
+        }
+
+        let cards = drawCards(amount)
+        showCards(cards)
+
+        self.delegate.gameDidChange()
     }
 
     func getCard(for index: Int) -> Card? {
@@ -196,4 +200,8 @@ final class SetGame {
         return equalCondition || differentCondition
     }
 
+}
+
+protocol SetGameDelegate {
+    func gameDidChange()
 }

@@ -23,7 +23,6 @@ final class ViewController: UIViewController {
 
     @IBAction private func drawThreeMoreCardsButtonTapped() {
         self.game.dealCards(3)
-        updateUI()
     }
 
     @IBAction private func newGameButtonTapped() {
@@ -33,14 +32,13 @@ final class ViewController: UIViewController {
     @IBAction private func cardButtonTapped(_ button: UIButton) {
         if let index = self.cardButtons.firstIndex(of: button) {
             self.game.touchCard(index: index)
-            updateUI()
         }
     }
 
     private func startNewGame() {
         self.game = SetGame()
+        self.game.delegate = self
         self.game.dealCards(12)
-        updateUI()
     }
 
     private func updateUI() {
@@ -72,6 +70,14 @@ final class ViewController: UIViewController {
         case .none:
             return .clear
         }
+    }
+
+}
+
+extension ViewController: SetGameDelegate {
+
+    func gameDidChange() {
+        updateUI()
     }
 
 }
