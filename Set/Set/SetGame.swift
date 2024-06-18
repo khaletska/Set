@@ -14,35 +14,28 @@ enum CardState {
 final class SetGame {
 
     var canDrawCards: Bool {
-        (self.shownCards.compactMap { $0 }.count < 24 ||
-         self.matchedCardsIndices.count > 2) &&
-        self.deck.count > 2
+        !self.deck.isEmpty && (findEmptySlot() != nil || self.matchedCardsIndices.count == 3)
     }
 
-    private var deck = Array<Card>()
-    private var shownCards: Array<Card?>
-    private var chosenCardsIndices: Array<Int>
-    private var matchedCardsIndices: Array<Int>
-    private var unmatchedCardsIndices: Array<Int>
-    private(set) var score: Int
-
-    init() {
-        self.shownCards = .init(repeating: nil, count: 24)
-        self.chosenCardsIndices = []
-        self.matchedCardsIndices = []
-        self.unmatchedCardsIndices = []
-        self.score = 0
-        generateDeck()
-    }
+    private var deck: Array<Card> = SetGame.generateDeck()
+    private var shownCards: Array<Card?> = .init(repeating: nil, count: 24)
+    private var chosenCardsIndices: Array<Int> = []
+    private var matchedCardsIndices: Array<Int> = []
+    private var unmatchedCardsIndices: Array<Int> = []
+    private(set) var score: Int = 0
 
     func dealCards(_ amount: Int) {
-        if matchedCardsIndices.count > 2 {
-            replaceMatchedCardsIfNeeded()
+        guard self.canDrawCards else {
+            assertionFailure("This case should be handled by UI")
+            return
         }
-        else {
-            let cards = drawCards(amount)
-            showCards(cards)
+
+        if !self.matchedCardsIndices.isEmpty {
+            removeMatchedCards()
         }
+
+        let cards = drawCards(amount)
+        showCards(cards)
     }
 
     func touchCard(index: Int) {
@@ -50,10 +43,18 @@ final class SetGame {
             return
         }
 
-        replaceMatchedCardsIfNeeded()
+        if !self.matchedCardsIndices.isEmpty {
+            removeMatchedCards()
+
+            if !self.deck.isEmpty {
+                dealCards(3)
+            }
+        }
+
         deselectUnmatchedCardsIfNeeded()
         updateSelectedState(for: index)
         updateMatchingState(for: index)
+        updateScore()
     }
 
     func getCard(for index: Int) -> Card? {
@@ -79,18 +80,19 @@ final class SetGame {
         }
     }
 
-    private func generateDeck() {
+    static private func generateDeck() -> Array<Card> {
+        var deck: Array<Card> = []
         for color in Card.Color.allCases {
             for shade in Card.Shade.allCases {
                 for shape in Card.Shape.allCases {
                     for number in Card.Number.allCases {
-                        self.deck.append(Card(color: color, shade: shade, shape: shape, number: number))
+                        deck.append(Card(color: color, shade: shade, shape: shape, number: number))
                     }
                 }
             }
         }
 
-        self.deck.shuffle()
+        return deck.shuffled()
     }
 
     private func drawCards(_ amount: Int) -> Array<Card> {
@@ -128,24 +130,39 @@ final class SetGame {
     }
 
     private func updateMatchingState(for cardIndex: Int) {
-        guard self.chosenCardsIndices.count > 2 else {
+        guard self.chosenCardsIndices.count == 3 else {
             return
         }
 
         if matchCards() {
             self.matchedCardsIndices.append(contentsOf: self.chosenCardsIndices)
-            self.score += 3
         }
         else {
             self.unmatchedCardsIndices.append(contentsOf: self.chosenCardsIndices)
-            self.score -= 3
         }
 
         self.chosenCardsIndices.removeAll()
     }
 
+    private func updateScore() {
+        if !self.matchedCardsIndices.isEmpty {
+            self.score += 3
+        }
+        else if !self.unmatchedCardsIndices.isEmpty {
+            self.score -= 3
+        }
+    }
+
+    private func removeMatchedCards() {
+        for index in self.matchedCardsIndices {
+            self.shownCards[index] = nil
+        }
+
+        self.matchedCardsIndices.removeAll()
+    }
+
     private func replaceMatchedCardsIfNeeded() {
-        guard self.matchedCardsIndices.count > 2 else {
+        guard self.matchedCardsIndices.count == 3 else {
             return
         }
 
@@ -158,7 +175,7 @@ final class SetGame {
     }
 
     private func deselectUnmatchedCardsIfNeeded() {
-        guard self.unmatchedCardsIndices.count > 2 else {
+        guard self.unmatchedCardsIndices.count == 3 else {
             return
         }
 
@@ -166,7 +183,7 @@ final class SetGame {
     }
 
     private func matchCards() -> Bool {
-        guard self.chosenCardsIndices.count > 2 else {
+        guard self.chosenCardsIndices.count == 3 else {
             return false
         }
 
