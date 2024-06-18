@@ -13,6 +13,7 @@ final class ViewController: UIViewController {
     @IBOutlet private var cardButtons: [UIButton]!
     @IBOutlet private weak var drawThreeMoreCardsButton: UIButton!
     @IBOutlet private weak var newGameButton: UIButton!
+    @IBOutlet private weak var scoreLabel: UILabel!
 
     override internal func viewDidLoad() {
         super.viewDidLoad()
@@ -21,7 +22,7 @@ final class ViewController: UIViewController {
     }
 
     @IBAction private func drawThreeMoreCardsButtonTapped() {
-        self.game.drawCards(3)
+        self.game.dealCards(3)
         updateUI()
     }
 
@@ -38,16 +39,15 @@ final class ViewController: UIViewController {
 
     private func startNewGame() {
         self.game = SetGame()
-        self.game.drawCards(12)
+        self.game.dealCards(12)
         updateUI()
     }
 
     private func updateUI() {
-        self.drawThreeMoreCardsButton.isEnabled = self.game.canDrawCards
-
         for (index, button) in self.cardButtons.enumerated() {
             if let card = self.game.getCard(for: index) {
-                button.configuration?.background.strokeColor = self.game.isCardChosen(at: index) ? .orange : .clear
+                button.configuration?.background.strokeColor = getCardHighlightColor(for: index)
+                button.configuration?.background.strokeWidth = 3
                 button.isHidden = false
 
                 button.setAttributedTitle(card.buildString(), for: .normal)
@@ -55,6 +55,22 @@ final class ViewController: UIViewController {
             else {
                 button.isHidden = true
             }
+        }
+
+        self.scoreLabel.text = "Score: \(self.game.score)"
+        self.drawThreeMoreCardsButton.isEnabled = self.game.canDrawCards
+    }
+
+    private func getCardHighlightColor(for index: Int) -> UIColor {
+        switch self.game.getCardState(for: index) {
+        case .chosen:
+            return .systemOrange
+        case .matched:
+            return .systemGreen
+        case .unmatched:
+            return .systemRed
+        case .none:
+            return .clear
         }
     }
 
