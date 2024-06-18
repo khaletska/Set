@@ -161,19 +161,6 @@ final class SetGame {
         self.matchedCardsIndices.removeAll()
     }
 
-    private func replaceMatchedCardsIfNeeded() {
-        guard self.matchedCardsIndices.count == 3 else {
-            return
-        }
-
-        for index in self.matchedCardsIndices {
-            self.shownCards[index] = nil
-        }
-
-        self.matchedCardsIndices.removeAll()
-        dealCards(3)
-    }
-
     private func deselectUnmatchedCardsIfNeeded() {
         guard self.unmatchedCardsIndices.count == 3 else {
             return
