@@ -7,66 +7,111 @@
 
 import UIKit
 
-class CardButton: UIButton {
+final class CardButton: UIButton {
 
     var color: UIColor = .clear
     var shape: Card.Shape = .diamond
 
     override func draw(_ rect: CGRect) {
-        let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: 16.0)
+        let roundedRect = UIBezierPath(roundedRect: self.bounds, cornerRadius: 16.0)
         roundedRect.addClip()
         UIColor.white.setFill()
         roundedRect.fill()
 
 
-        drawBezierPath(for: shape, with: color)
+        drawBezierPath()
     }
 
-    private func drawBezierPath(for shape: Card.Shape,
-                               with color: UIColor) {
-
+    private func drawBezierPath() {
         switch shape {
-        case .diamond:
-            let path = UIBezierPath()
-            path.move(to: CGPoint(x: bounds.midX - self.symbolWidth / 2, y: bounds.midY))
-            path.addLine(to: CGPoint(x: bounds.midX, y: bounds.midY + self.symbolHeight / 2))
-            path.addLine(to: CGPoint(x: bounds.midX + self.symbolWidth / 2, y: bounds.midY))
-            path.addLine(to: CGPoint(x: bounds.midX, y: bounds.midY - self.symbolHeight / 2))
-            path.close()
-            self.color.setFill()
-            path.fill()
-        case .oval:
-            let path = UIBezierPath(roundedRect:
-                                        CGRect(
-                                            x: bounds.midX - self.symbolWidth / 2,
-                                            y: bounds.midY - self.symbolHeight / 2,
-                                            width: self.symbolWidth,
-                                            height: self.symbolHeight),
-                                    cornerRadius: self.symbolHeight / 2)
-            self.color.setFill()
-            path.fill()
-        case .squiggle:
-            let path = UIBezierPath()
-            path.move(to: CGPoint(x: bounds.midX - self.symbolWidth / 2, y: bounds.midY + self.symbolHeight / 2))
-            path.addCurve(to: CGPoint(x: bounds.midX + self.symbolWidth / 2, y: bounds.midY - self.symbolHeight / 2),
-                          controlPoint1: CGPoint(x: bounds.midX - self.symbolWidth / 2, y: bounds.midY - self.symbolHeight),
-                          controlPoint2: CGPoint(x: bounds.midX + self.symbolWidth / 4, y: bounds.midY))
-            path.addCurve(to: CGPoint(x: bounds.midX - self.symbolWidth / 2, y: bounds.midY + self.symbolHeight / 2),
-                          controlPoint1: CGPoint(x: bounds.midX + self.symbolWidth / 2, y: bounds.midY + self.symbolHeight),
-                          controlPoint2: CGPoint(x: bounds.midX - self.symbolWidth / 4, y: bounds.midY))
-            path.close()
-            self.color.setFill()
-            path.fill()
-
+        case .diamond: drawPathForDiamond()
+        case .oval: drawPathForOval()
+        case .squiggle: drawPathForSquiggle()
         }
     }
 
-}
+    private func drawPathForDiamond() {
+        let path = UIBezierPath()
+        let diamondTop = CGPoint(
+            x: self.bounds.midX - self.symbolWidth / 2,
+            y: self.bounds.midY
+        )
+        path.move(to: diamondTop)
 
-extension CGPoint {
-    func offsetBy(dx: CGFloat, dy: CGFloat) -> CGPoint {
-        return CGPoint(x: x+dx, y: y+dy)
+        let diamontRight = CGPoint(
+            x: self.bounds.midX,
+            y: self.bounds.midY + self.symbolHeight / 2
+        )
+        path.addLine(to: diamontRight)
+
+        let diamondBottom = CGPoint(
+            x: self.bounds.midX + self.symbolWidth / 2,
+            y: self.bounds.midY
+        )
+        path.addLine(to: diamondBottom)
+
+        let diamondLeft = CGPoint(
+            x: self.bounds.midX,
+            y: self.bounds.midY - self.symbolHeight / 2
+        )
+        path.addLine(to: diamondLeft)
+        path.close()
+
+        self.color.setFill()
+        path.fill()
     }
+
+    private func drawPathForOval() {
+        let shapeTopLeftCorner = CGPoint(
+            x: self.bounds.midX - self.symbolWidth / 2,
+            y: self.bounds.midY - self.symbolHeight / 2
+        )
+
+        let roundedRect = CGRect(origin: shapeTopLeftCorner, size: self.symbolSize)
+        let path = UIBezierPath(roundedRect: roundedRect, cornerRadius: self.symbolHeight / 2)
+
+        self.color.setFill()
+        path.fill()
+    }
+
+    private func drawPathForSquiggle() {
+        let shapeBottomLeftCorner = CGPoint(
+            x: self.bounds.midX - self.symbolWidth / 2,
+            y: self.bounds.midY + self.symbolHeight / 2
+        )
+
+        let path = UIBezierPath()
+        path.move(to: shapeBottomLeftCorner)
+
+        let shapeTopRightCorner = CGPoint(
+            x: self.bounds.midX + self.symbolWidth / 2,
+            y: self.bounds.midY - self.symbolHeight / 2
+        )
+        let topLeftControlPoint = CGPoint(
+            x: self.bounds.midX - self.symbolWidth / 2,
+            y: self.bounds.midY - self.symbolHeight
+        )
+        let topRightControlPoint = CGPoint(
+            x: self.bounds.midX + self.symbolWidth / 4,
+            y: self.bounds.midY
+        )
+        path.addCurve(to: shapeTopRightCorner, controlPoint1: topLeftControlPoint, controlPoint2: topRightControlPoint)
+
+        let bottomRightControlPoint = CGPoint(
+            x: self.bounds.midX + self.symbolWidth / 2,
+            y: self.bounds.midY + self.symbolHeight
+        )
+        let bottomLeftControlPoint = CGPoint(
+            x: self.bounds.midX - self.symbolWidth / 4,
+            y: self.bounds.midY
+        )
+        path.addCurve(to: shapeBottomLeftCorner, controlPoint1: bottomRightControlPoint, controlPoint2: bottomLeftControlPoint)
+        path.close()
+
+        self.color.setFill()
+        path.fill()
+    }
+
 }
 
 extension CardButton {
@@ -76,11 +121,16 @@ extension CardButton {
         static let heightRatio = 0.2
     }
 
-    public var symbolWidth: CGFloat {
-        bounds.size.width * SizeRatio.widthRatio
+    var symbolWidth: CGFloat {
+        self.bounds.size.width * SizeRatio.widthRatio
     }
 
-    public var symbolHeight: CGFloat {
-        bounds.size.height * SizeRatio.heightRatio
+    var symbolHeight: CGFloat {
+        self.bounds.size.height * SizeRatio.heightRatio
     }
+
+    var symbolSize: CGSize {
+        .init(width: self.symbolWidth, height: self.symbolHeight)
+    }
+
 }
