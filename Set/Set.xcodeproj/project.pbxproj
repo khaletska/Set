@@ -15,6 +15,9 @@
 		04A791EF2C183F0000508ED7 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 04A791EE2C183F0000508ED7 /* Base */; };
 		04A791F12C183F0100508ED7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04A791F02C183F0100508ED7 /* Assets.xcassets */; };
 		04A791F42C183F0100508ED7 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 04A791F32C183F0100508ED7 /* Base */; };
+		04E5193E2C256648001B2641 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E5193D2C256648001B2641 /* Grid.swift */; };
+		04E519402C256AD1001B2641 /* CardButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E5193F2C256AD1001B2641 /* CardButton.swift */; };
+		04E519422C256DB0001B2641 /* GridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E519412C256DB0001B2641 /* GridView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +31,9 @@
 		04A791F02C183F0100508ED7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		04A791F32C183F0100508ED7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		04A791F52C183F0100508ED7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		04E5193D2C256648001B2641 /* Grid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Grid.swift; sourceTree = "<group>"; };
+		04E5193F2C256AD1001B2641 /* CardButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardButton.swift; sourceTree = "<group>"; };
+		04E519412C256DB0001B2641 /* GridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,17 +66,52 @@
 		04A791E62C183F0000508ED7 /* Set */ = {
 			isa = PBXGroup;
 			children = (
-				04A791E72C183F0000508ED7 /* AppDelegate.swift */,
-				04A791E92C183F0000508ED7 /* SceneDelegate.swift */,
-				04A791EB2C183F0000508ED7 /* ViewController.swift */,
-				04742AFE2C19957D007F2E0B /* Card.swift */,
-				0421C30B2C185D2100B78184 /* SetGame.swift */,
-				04A791ED2C183F0000508ED7 /* Main.storyboard */,
-				04A791F02C183F0100508ED7 /* Assets.xcassets */,
-				04A791F22C183F0100508ED7 /* LaunchScreen.storyboard */,
+				04E519442C256E81001B2641 /* Model */,
+				04E519462C256E98001B2641 /* View */,
+				04E519452C256E90001B2641 /* Controller */,
 				04A791F52C183F0100508ED7 /* Info.plist */,
+				04E519432C256E57001B2641 /* SupporingFiles */,
 			);
 			path = Set;
+			sourceTree = "<group>";
+		};
+		04E519432C256E57001B2641 /* SupporingFiles */ = {
+			isa = PBXGroup;
+			children = (
+				04A791E72C183F0000508ED7 /* AppDelegate.swift */,
+				04A791E92C183F0000508ED7 /* SceneDelegate.swift */,
+				04A791F02C183F0100508ED7 /* Assets.xcassets */,
+				04A791F22C183F0100508ED7 /* LaunchScreen.storyboard */,
+			);
+			path = SupporingFiles;
+			sourceTree = "<group>";
+		};
+		04E519442C256E81001B2641 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				0421C30B2C185D2100B78184 /* SetGame.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		04E519452C256E90001B2641 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				04A791EB2C183F0000508ED7 /* ViewController.swift */,
+				04742AFE2C19957D007F2E0B /* Card.swift */,
+				04E5193D2C256648001B2641 /* Grid.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		04E519462C256E98001B2641 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				04E5193F2C256AD1001B2641 /* CardButton.swift */,
+				04E519412C256DB0001B2641 /* GridView.swift */,
+				04A791ED2C183F0000508ED7 /* Main.storyboard */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -144,11 +185,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04E519402C256AD1001B2641 /* CardButton.swift in Sources */,
 				04A791EC2C183F0000508ED7 /* ViewController.swift in Sources */,
+				04E519422C256DB0001B2641 /* GridView.swift in Sources */,
 				04A791E82C183F0000508ED7 /* AppDelegate.swift in Sources */,
 				04742AFF2C19957D007F2E0B /* Card.swift in Sources */,
 				0421C30C2C185D2100B78184 /* SetGame.swift in Sources */,
 				04A791EA2C183F0000508ED7 /* SceneDelegate.swift in Sources */,
+				04E5193E2C256648001B2641 /* Grid.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

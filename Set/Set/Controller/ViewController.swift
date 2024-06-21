@@ -10,7 +10,7 @@ import UIKit
 final class ViewController: UIViewController {
 
     private var game: SetGame!
-    @IBOutlet private var cardButtons: [UIButton]!
+    @IBOutlet private var cardButtons: [CardButton]!
     @IBOutlet private weak var drawThreeMoreCardsButton: UIButton!
     @IBOutlet private weak var newGameButton: UIButton!
     @IBOutlet private weak var scoreLabel: UILabel!
@@ -29,7 +29,7 @@ final class ViewController: UIViewController {
         startNewGame()
     }
 
-    @IBAction private func cardButtonTapped(_ button: UIButton) {
+    @IBAction private func cardButtonTapped(_ button: CardButton) {
         if let index = self.cardButtons.firstIndex(of: button) {
             self.game.touchCard(index: index)
         }
@@ -44,11 +44,11 @@ final class ViewController: UIViewController {
     private func updateUI() {
         for (index, button) in self.cardButtons.enumerated() {
             if let card = self.game.getCard(for: index) {
+                button.color = card.getColor()
+                button.shape = card.shape
                 button.configuration?.background.strokeColor = getCardHighlightColor(for: index)
                 button.configuration?.background.strokeWidth = 3
                 button.isHidden = false
-
-                button.setAttributedTitle(card.buildString(), for: .normal)
             }
             else {
                 button.isHidden = true
@@ -84,17 +84,6 @@ extension ViewController: SetGameDelegate {
 
 private extension Card {
 
-    func buildString() -> NSAttributedString {
-        let attributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: getColor().withAlphaComponent(getOpacity()),
-            .strokeColor: getColor(),
-            .strokeWidth: -3.0
-        ]
-
-        let string = String(repeating: getShape(), count: getNumber())
-        return NSAttributedString(string: string, attributes: attributes)
-    }
-
     func getColor() -> UIColor {
         switch self.color {
         case .red:
@@ -114,17 +103,6 @@ private extension Card {
             return 0.15
         case .solid:
             return 1.0
-        }
-    }
-
-    func getShape() -> String {
-        switch self.shape {
-        case .diamond:
-            return "▲"
-        case .squiggle:
-            return "■"
-        case .oval:
-            return "●"
         }
     }
 
