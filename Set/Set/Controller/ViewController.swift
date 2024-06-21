@@ -49,8 +49,6 @@ final class ViewController: UIViewController {
                 button.configuration?.background.strokeColor = getCardHighlightColor(for: index)
                 button.configuration?.background.strokeWidth = 3
                 button.isHidden = false
-
-//                button.setAttributedTitle(card.buildString(), for: .normal)
             }
             else {
                 button.isHidden = true
@@ -86,17 +84,6 @@ extension ViewController: SetGameDelegate {
 
 private extension Card {
 
-    func buildString() -> NSAttributedString {
-        let attributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: getColor().withAlphaComponent(getOpacity()),
-            .strokeColor: getColor(),
-            .strokeWidth: -3.0
-        ]
-
-        let string = String(repeating: getShape(), count: getNumber())
-        return NSAttributedString(string: string, attributes: attributes)
-    }
-
     func getColor() -> UIColor {
         switch self.color {
         case .red:
@@ -116,17 +103,6 @@ private extension Card {
             return 0.15
         case .solid:
             return 1.0
-        }
-    }
-
-    func getShape() -> String {
-        switch self.shape {
-        case .diamond:
-            return "▲"
-        case .squiggle:
-            return "■"
-        case .oval:
-            return "●"
         }
     }
 
