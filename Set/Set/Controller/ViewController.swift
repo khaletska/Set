@@ -47,6 +47,7 @@ final class ViewController: UIViewController {
                 button.color = card.getColor()
                 button.shape = card.shape
                 button.number = card.number
+                button.shade = card.shade
                 button.configuration?.background.strokeColor = getCardHighlightColor(for: index)
                 button.configuration?.background.strokeWidth = 3
                 button.isHidden = false
@@ -93,17 +94,6 @@ private extension Card {
             return .systemGreen
         case .purple:
             return .systemPurple
-        }
-    }
-
-    func getOpacity() -> CGFloat {
-        switch self.shade {
-        case .open:
-            return 0.0
-        case .striped:
-            return 0.15
-        case .solid:
-            return 1.0
         }
     }
 
