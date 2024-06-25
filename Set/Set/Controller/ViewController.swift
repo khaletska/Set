@@ -46,6 +46,7 @@ final class ViewController: UIViewController {
             if let card = self.game.getCard(for: index) {
                 button.color = card.getColor()
                 button.shape = card.shape
+                button.number = card.getNumber()
                 button.configuration?.background.strokeColor = getCardHighlightColor(for: index)
                 button.configuration?.background.strokeWidth = 3
                 button.isHidden = false
