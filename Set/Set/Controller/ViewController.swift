@@ -46,6 +46,7 @@ final class ViewController: UIViewController {
             if let card = self.game.getCard(for: index) {
                 button.color = card.getColor()
                 button.shape = card.shape
+                button.number = card.number
                 button.configuration?.background.strokeColor = getCardHighlightColor(for: index)
                 button.configuration?.background.strokeWidth = 3
                 button.isHidden = false
@@ -103,17 +104,6 @@ private extension Card {
             return 0.15
         case .solid:
             return 1.0
-        }
-    }
-
-    func getNumber() -> Int {
-        switch self.number {
-        case .one:
-            return 1
-        case .two:
-            return 2
-        case .three:
-            return 3
         }
     }
 
