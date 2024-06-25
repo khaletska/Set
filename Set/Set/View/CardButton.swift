@@ -11,7 +11,7 @@ final class CardButton: UIButton {
 
     var color: UIColor = .clear
     var shape: Card.Shape = .diamond
-    var number: Int = 1
+    var number: Card.Number = .one
 
     override func draw(_ rect: CGRect) {
         let roundedRect = UIBezierPath(roundedRect: self.bounds, cornerRadius: 16.0)
@@ -23,19 +23,19 @@ final class CardButton: UIButton {
     }
 
     private func drawBezierPath() {
-        let offsets = getCenterOffsets(for: self.number)
+        let offsets = getVerticalCenterOffsets(for: self.number)
         switch shape {
         case .diamond:
             for offset in offsets {
-                drawPathForDiamond(from: self.cardCenter.offsetBy(dx: offset[0], dy: offset[1]))
+                drawPathForDiamond(from: self.cardCenter.offsetBy(dx:0, dy: offset))
             }
-        case .oval: 
+        case .oval:
             for offset in offsets {
-                drawPathForOval(from: self.cardCenter.offsetBy(dx: offset[0], dy: offset[1]))
+                drawPathForOval(from: self.cardCenter.offsetBy(dx: 0, dy: offset))
             }
-        case .squiggle: 
+        case .squiggle:
             for offset in offsets {
-                drawPathForSquiggle(from: self.cardCenter.offsetBy(dx: offset[0], dy: offset[1]))
+                drawPathForSquiggle(from: self.cardCenter.offsetBy(dx: 0, dy: offset))
             }
         }
     }
@@ -94,7 +94,8 @@ extension CardButton {
 
     private struct SizeRatio {
         static let widthRatio = 0.6
-        static let heightRatio = 0.2
+        static let heightRatio = 0.23
+        static let offsetRatio = 0.15
     }
 
     private var symbolWidth: CGFloat {
@@ -105,6 +106,10 @@ extension CardButton {
         self.bounds.size.height * SizeRatio.heightRatio
     }
 
+    private var verticalOffsetMin: CGFloat {
+        self.bounds.size.height * SizeRatio.offsetRatio
+    }
+
     private var symbolSize: CGSize {
         .init(width: self.symbolWidth, height: self.symbolHeight)
     }
@@ -113,18 +118,18 @@ extension CardButton {
         .init(x: self.bounds.midX, y: self.bounds.midY)
     }
 
-    private func getCenterOffsets(for number: Int) -> Array<Array<CGFloat>> {
-        let centerOffsetsForSymbols: Array<Array<Array<CGFloat>>> = [[[0, 0]], // case one symbol
-                                                                     [[0, -12.5], [0, 12.5]], // case two symbols
-                                                                     [[0, -25], [0, 0], [0, 25]]] // case three symbols
-
-        return centerOffsetsForSymbols[number-1]
+    private func getVerticalCenterOffsets(for number: Card.Number) -> Array<CGFloat> {
+        switch number {
+        case .one: [0 * self.verticalOffsetMin]
+        case .two: [-1 * self.verticalOffsetMin, 1 * self.verticalOffsetMin]
+        case .three: [-2 * self.verticalOffsetMin, 0 * self.verticalOffsetMin, 2 * self.verticalOffsetMin]
+        }
     }
 
 }
 
 extension CGPoint {
     func offsetBy(dx: CGFloat, dy: CGFloat) -> CGPoint {
-        return CGPoint(x: x+dx, y: y+dy)
+        CGPoint(x: x + dx, y: y + dy)
     }
 }
