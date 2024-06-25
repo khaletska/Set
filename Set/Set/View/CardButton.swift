@@ -106,11 +106,7 @@ extension CardButton {
         self.bounds.size.height * SizeRatio.heightRatio
     }
 
-    private var verticalOffsetMin: CGFloat {
-        self.bounds.size.height * SizeRatio.offsetRatio
     }
-
-    private var symbolSize: CGSize {
         .init(width: self.symbolWidth, height: self.symbolHeight)
     }
 
