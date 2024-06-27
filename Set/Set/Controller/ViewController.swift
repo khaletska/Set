@@ -10,7 +10,7 @@ import UIKit
 final class ViewController: UIViewController {
 
     private var game: SetGame!
-    @IBOutlet private var cardButtons: [CardButton]!
+    @IBOutlet private weak var gridView: GridView!
     @IBOutlet private weak var drawThreeMoreCardsButton: UIButton!
     @IBOutlet private weak var newGameButton: UIButton!
     @IBOutlet private weak var scoreLabel: UILabel!
@@ -29,8 +29,8 @@ final class ViewController: UIViewController {
         startNewGame()
     }
 
-    @IBAction private func cardButtonTapped(_ button: CardButton) {
-        if let index = self.cardButtons.firstIndex(of: button) {
+    private func cardButtonTapped(_ index: Int) {
+        if (self.game.shownCards[index] != nil) {
             self.game.touchCard(index: index)
         }
     }
@@ -39,23 +39,19 @@ final class ViewController: UIViewController {
         self.game = SetGame()
         self.game.delegate = self
         self.game.dealCards(12)
+
+        self.gridView.cardButtonTappedHandler = { [weak self] cardIndex in
+            self?.cardButtonTapped(cardIndex)
+        }
+
+        self.gridView.getCardHighlightColorForCard = { [weak self] cardIndex in
+            self?.getCardHighlightColor(for: cardIndex) ?? .clear
+        }
     }
 
     private func updateUI() {
-        for (index, button) in self.cardButtons.enumerated() {
-            if let card = self.game.getCard(for: index) {
-                button.color = card.getColor()
-                button.shape = card.shape
-                button.number = card.number
-                button.shade = card.shade
-                button.configuration?.background.strokeColor = getCardHighlightColor(for: index)
-                button.configuration?.background.strokeWidth = 3
-                button.isHidden = false
-            }
-            else {
-                button.isHidden = true
-            }
-        }
+        self.gridView.add(self.game.shownCards)
+
 
         self.scoreLabel.text = "Score: \(self.game.score)"
         self.drawThreeMoreCardsButton.isEnabled = self.game.canDrawCards
@@ -80,21 +76,6 @@ extension ViewController: SetGameDelegate {
 
     func gameDidChange() {
         updateUI()
-    }
-
-}
-
-private extension Card {
-
-    func getColor() -> UIColor {
-        switch self.color {
-        case .red:
-            return .systemRed
-        case .green:
-            return .systemGreen
-        case .purple:
-            return .systemPurple
-        }
     }
 
 }

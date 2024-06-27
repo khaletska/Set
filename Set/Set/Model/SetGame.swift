@@ -17,8 +17,8 @@ final class SetGame {
         !self.deck.isEmpty && (findEmptySlot() != nil || self.matchedCardsIndices.count == 3)
     }
     var delegate: SetGameDelegate!
+    var shownCards: Array<Card?> = .init(repeating: nil, count: 81)
     private var deck: Array<Card> = SetGame.generateDeck()
-    private var shownCards: Array<Card?> = .init(repeating: nil, count: 24)
     private var chosenCardsIndices: Array<Int> = []
     private var matchedCardsIndices: Array<Int> = []
     private var unmatchedCardsIndices: Array<Int> = []
