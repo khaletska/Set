@@ -19,22 +19,22 @@ final class SetGame {
     var delegate: SetGameDelegate!
     var shownCards: Array<Card?> = .init(repeating: nil, count: 12)
     private var deck: Array<Card> = SetGame.generateDeck()
-    private var chosenCardsIndices: Array<Int> = []
-    private var matchedCardsIndices: Array<Int> = []
-    private var unmatchedCardsIndices: Array<Int> = []
+    private var chosenCardsIDs: Array<Int> = []
+    private var matchedCardsIDs: Array<Int> = []
+    private var unmatchedCardsIDs: Array<Int> = []
     private(set) var score: Int = 0
 
     func touchCard(indexOnBoard: Int) {
-        guard let ID = getCardID(by: indexOnBoard) else {
+        guard let id = getCardID(by: indexOnBoard) else {
             return
         }
 
-        guard !self.matchedCardsIndices.contains(ID) else {
+        guard !self.matchedCardsIDs.contains(id) else {
             return
         }
 
-        updateSelectedState(for: ID)
-        if !self.matchedCardsIndices.isEmpty {
+        updateSelectedState(for: id)
+        if !self.matchedCardsIDs.isEmpty {
             removeMatchedCards()
 
             if !self.deck.isEmpty {
@@ -43,7 +43,7 @@ final class SetGame {
         }
 
         deselectUnmatchedCardsIfNeeded()
-        updateMatchingState(for: ID)
+        updateMatchingState(for: id)
         updateScore()
 
         self.delegate.gameDidChange()
@@ -55,7 +55,7 @@ final class SetGame {
             return
         }
 
-        if !self.matchedCardsIndices.isEmpty {
+        if !self.matchedCardsIDs.isEmpty {
             removeMatchedCards()
         }
 
@@ -66,17 +66,17 @@ final class SetGame {
     }
 
     func getCardState(for indexOnBoard: Int) -> CardState? {
-        guard let ID = getCardID(by: indexOnBoard) else {
+        guard let id = getCardID(by: indexOnBoard) else {
             return .none
         }
 
-        if self.matchedCardsIndices.contains(ID) {
+        if self.matchedCardsIDs.contains(id) {
             return .matched
         }
-        else if self.unmatchedCardsIndices.contains(ID) {
+        else if self.unmatchedCardsIDs.contains(id) {
             return .unmatched
         }
-        else if self.chosenCardsIndices.contains(ID) {
+        else if self.chosenCardsIDs.contains(id) {
             return .chosen
         }
         else {
@@ -91,14 +91,14 @@ final class SetGame {
             for shade in Card.Shade.allCases {
                 for shape in Card.Shape.allCases {
                     for number in Card.Number.allCases {
-                        deck.append(Card(color: color, shade: shade, shape: shape, number: number, ID: iterator))
+                        deck.append(Card(color: color, shade: shade, shape: shape, number: number, id: iterator))
                         iterator += 1
                     }
                 }
             }
         }
 
-        return deck//.shuffled()
+        return deck.shuffled()
     }
 
     private func drawCards(_ amount: Int) -> Array<Card> {
@@ -130,64 +130,64 @@ final class SetGame {
     }
 
     private func updateSelectedState(for cardID: Int) {
-        if self.chosenCardsIndices.contains(cardID) {
-            chosenCardsIndices.removeAll { $0 == cardID }
+        if self.chosenCardsIDs.contains(cardID) {
+            chosenCardsIDs.removeAll { $0 == cardID }
         }
         else {
-            self.chosenCardsIndices.append(cardID)
+            self.chosenCardsIDs.append(cardID)
         }
     }
 
     private func updateMatchingState(for cardIndex: Int) {
-        guard self.chosenCardsIndices.count == 3 else {
+        guard self.chosenCardsIDs.count == 3 else {
             return
         }
 
         if matchCards() {
-            self.matchedCardsIndices.append(contentsOf: self.chosenCardsIndices)
+            self.matchedCardsIDs.append(contentsOf: self.chosenCardsIDs)
         }
         else {
-            self.unmatchedCardsIndices.append(contentsOf: self.chosenCardsIndices)
+            self.unmatchedCardsIDs.append(contentsOf: self.chosenCardsIDs)
         }
 
-        self.chosenCardsIndices.removeAll()
+        self.chosenCardsIDs.removeAll()
     }
 
     private func updateScore() {
-        if !self.matchedCardsIndices.isEmpty {
+        if !self.matchedCardsIDs.isEmpty {
             self.score += 3
         }
-        else if !self.unmatchedCardsIndices.isEmpty {
+        else if !self.unmatchedCardsIDs.isEmpty {
             self.score -= 3
         }
     }
 
     private func removeMatchedCards() {
-        let matchedIndexesOnBoard = self.matchedCardsIndices.map { getCardIndexOnBoard(by: $0) }.compactMap { $0 }
+        let matchedIndexesOnBoard = self.matchedCardsIDs.map { getCardIndexOnBoard(by: $0) }.compactMap { $0 }
 
         for indexOnBoard in matchedIndexesOnBoard {
             self.shownCards[indexOnBoard] = nil
         }
 
-        self.matchedCardsIndices.removeAll()
+        self.matchedCardsIDs.removeAll()
     }
 
     private func deselectUnmatchedCardsIfNeeded() {
-        guard self.unmatchedCardsIndices.count == 3 else {
+        guard self.unmatchedCardsIDs.count == 3 else {
             return
         }
 
-        self.unmatchedCardsIndices.removeAll()
+        self.unmatchedCardsIDs.removeAll()
     }
 
     private func matchCards() -> Bool {
-        guard self.chosenCardsIndices.count == 3 else {
+        guard self.chosenCardsIDs.count == 3 else {
             return false
         }
 
         var chosenCards: [Card] = []
-        for ID in self.chosenCardsIndices {
-            if let card = self.shownCards.compactMap({ $0 }).first(where: { $0.ID == ID }) {
+        for id in self.chosenCardsIDs {
+            if let card = self.shownCards.compactMap({ $0 }).first(where: { $0.id == id }) {
                 chosenCards.append(card)
             }
         }
@@ -213,11 +213,11 @@ final class SetGame {
     }
 
     private func getCardID(by indexOnBoard: Int) -> Int? {
-        self.shownCards.compactMap { $0 }[indexOnBoard].ID
+        self.shownCards.compactMap { $0 }[indexOnBoard].id
     }
 
-    private func getCardIndexOnBoard(by ID: Int) -> Int? {
-        self.shownCards.firstIndex { $0?.ID == ID }
+    private func getCardIndexOnBoard(by id: Int) -> Int? {
+        self.shownCards.firstIndex { $0?.id == id }
     }
 
 }

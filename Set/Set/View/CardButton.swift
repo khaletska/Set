@@ -9,12 +9,27 @@ import UIKit
 
 final class CardButton: UIButton {
 
-    var color: UIColor = .clear
-    var shape: Card.Shape = .diamond
-    var number: Card.Number = .one
-    var shade: Card.Shade = .open
-    var highlight: UIColor = .clear
-    var ID: Int = -1
+    private var color: UIColor
+    private var shape: Card.Shape
+    private var number: Card.Number
+    private var shade: Card.Shade
+    private var highlight: UIColor
+    var indexOnBoard: Int
+
+    init(card: Card, index: Int, highlight: UIColor, frame: CGRect) {
+        self.color = card.getColor()
+        self.shape = card.shape
+        self.number = card.number
+        self.shade = card.shade
+        self.indexOnBoard = index
+        self.highlight = highlight
+
+        super.init(frame: frame)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func draw(_ rect: CGRect) {
         let roundedRect = UIBezierPath(roundedRect: self.bounds, cornerRadius: self.cornerRadius)
@@ -24,7 +39,7 @@ final class CardButton: UIButton {
         highlight.setStroke()
         roundedRect.lineWidth = 3
         roundedRect.stroke()
-        
+
         drawBezierPath()
     }
 
@@ -134,6 +149,21 @@ final class CardButton: UIButton {
             path.fill()
         }
     }
+}
+
+private extension Card {
+
+    func getColor() -> UIColor {
+        switch self.color {
+        case .red:
+            return .systemRed
+        case .green:
+            return .systemGreen
+        case .purple:
+            return .systemPurple
+        }
+    }
+
 }
 
 extension CardButton {
