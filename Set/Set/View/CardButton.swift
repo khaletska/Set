@@ -9,83 +9,159 @@ import UIKit
 
 final class CardButton: UIButton {
 
-    var color: UIColor = .clear
-    var shape: Card.Shape = .diamond
-    var number: Card.Number = .one
+    private var color: UIColor
+    private var shape: Card.Shape
+    private var number: Card.Number
+    private var shade: Card.Shade
+    private var highlight: UIColor
+    var indexOnBoard: Int
+
+    init(card: Card, index: Int, highlight: UIColor, frame: CGRect) {
+        self.color = card.getColor()
+        self.shape = card.shape
+        self.number = card.number
+        self.shade = card.shade
+        self.indexOnBoard = index
+        self.highlight = highlight
+
+        super.init(frame: frame)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func draw(_ rect: CGRect) {
-        let roundedRect = UIBezierPath(roundedRect: self.bounds, cornerRadius: 16.0)
+        let roundedRect = UIBezierPath(roundedRect: self.bounds, cornerRadius: self.cornerRadius)
         roundedRect.addClip()
         UIColor.white.setFill()
         roundedRect.fill()
+        highlight.setStroke()
+        roundedRect.lineWidth = 3
+        roundedRect.stroke()
 
         drawBezierPath()
     }
 
     private func drawBezierPath() {
-        let offsets = getVerticalCenterOffsets(for: self.number)
         switch shape {
-        case .diamond:
-            for offset in offsets {
-                drawPathForDiamond(from: self.cardCenter.offsetBy(dx:0, dy: offset))
-            }
-        case .oval:
-            for offset in offsets {
-                drawPathForOval(from: self.cardCenter.offsetBy(dx: 0, dy: offset))
-            }
-        case .squiggle:
-            for offset in offsets {
-                drawPathForSquiggle(from: self.cardCenter.offsetBy(dx: 0, dy: offset))
-            }
+        case .diamond: drawPathForDiamond()
+        case .oval: drawPathForOval()
+        case .squiggle: drawPathForSquiggle()
         }
     }
 
-    private func drawPathForDiamond(from center: CGPoint) {
-        let path = UIBezierPath()
-        let diamondLeft = center.offsetBy(dx: -self.symbolWidth / 2, dy: 0)
-        path.move(to: diamondLeft)
+    private func drawVerticalStripes() {
+        let start = self.bounds.minX
+        let end = self.bounds.maxX
+        let stripeSpacing = self.symbolWidth * 0.06
 
-        let diamontTop = center.offsetBy(dx: 0, dy: self.symbolHeight / 2)
-        path.addLine(to: diamontTop)
+        var x = start
+        while x <= end {
+            let stripePath = UIBezierPath()
+            stripePath.move(to: CGPoint(x: x, y: self.bounds.minY))
+            stripePath.addLine(to: CGPoint(x: x, y: self.bounds.maxY))
+            stripePath.lineWidth = self.symbolWidth / 40
+            self.color.setStroke()
+            stripePath.stroke()
 
-        let diamondRight = center.offsetBy(dx: self.symbolWidth / 2, dy: 0)
-        path.addLine(to: diamondRight)
-
-        let diamondTop = center.offsetBy(dx: 0, dy: -self.symbolHeight / 2)
-        path.addLine(to: diamondTop)
-        path.close()
-
-        self.color.setFill()
-        path.fill()
+            x += stripeSpacing
+        }
     }
 
-    private func drawPathForOval(from center: CGPoint) {
-        let shapeTopLeftCorner = center.offsetBy(dx: -self.symbolWidth / 2, dy: -self.symbolHeight / 2)
-        let roundedRect = CGRect(origin: shapeTopLeftCorner, size: self.symbolSize)
-        let path = UIBezierPath(roundedRect: roundedRect, cornerRadius: self.symbolHeight / 2)
+    private func drawPathForDiamond() {
+        let offsets = getVerticalCenterOffsets(for: self.number)
+        let path = UIBezierPath()
+        for offset in offsets {
+            let diamondLeft = self.leftTopCornerOfCentralSymbol
+                .offsetBy(dx: 0, dy: self.symbolHeight / 2 + offset)
+            path.move(to: diamondLeft)
 
-        self.color.setFill()
-        path.fill()
+            let diamondBottom = self.leftTopCornerOfCentralSymbol
+                .offsetBy(dx: self.symbolWidth / 2, dy: self.symbolHeight + offset)
+            path.addLine(to: diamondBottom)
+
+            let diamondRight = self.leftTopCornerOfCentralSymbol
+                .offsetBy(dx: self.symbolWidth, dy: self.symbolHeight / 2 + offset)
+            path.addLine(to: diamondRight)
+
+            let diamondTop = self.leftTopCornerOfCentralSymbol
+                .offsetBy(dx: self.symbolWidth / 2, dy: offset)
+            path.addLine(to: diamondTop)
+            path.close()
+        }
+
+        applyShade(for: path)
     }
 
-    private func drawPathForSquiggle(from center: CGPoint) {
-        let shapeBottomLeftCorner = center.offsetBy(dx: -self.symbolWidth / 2, dy: self.symbolHeight / 2)
-
+    private func drawPathForOval() {
+        let offsets = getVerticalCenterOffsets(for: self.number)
         let path = UIBezierPath()
-        path.move(to: shapeBottomLeftCorner)
+        for offset in offsets {
+            let shapeTopLeftCorner = self.leftTopCornerOfCentralSymbol.offsetBy(dx: 0, dy: offset)
+            let roundedRect = CGRect(origin: shapeTopLeftCorner, size: self.symbolSize)
+            path.append(UIBezierPath(roundedRect: roundedRect, cornerRadius: self.symbolHeight / 2))
+        }
 
-        let shapeTopRightCorner = center.offsetBy(dx: self.symbolWidth / 2, dy: -self.symbolHeight / 2)
-        let topLeftControlPoint = center.offsetBy(dx: -self.symbolWidth / 2, dy: -self.symbolHeight)
-        let topRightControlPoint = center.offsetBy(dx: self.symbolWidth / 4, dy: 0)
-        path.addCurve(to: shapeTopRightCorner, controlPoint1: topLeftControlPoint, controlPoint2: topRightControlPoint)
+        applyShade(for: path)
+    }
 
-        let bottomRightControlPoint = center.offsetBy(dx: self.symbolWidth / 2, dy: self.symbolHeight)
-        let bottomLeftControlPoint = center.offsetBy(dx: -self.symbolWidth / 4, dy: 0)
-        path.addCurve(to: shapeBottomLeftCorner, controlPoint1: bottomRightControlPoint, controlPoint2: bottomLeftControlPoint)
-        path.close()
+    private func drawPathForSquiggle() {
+        let offsets = getVerticalCenterOffsets(for: self.number)
+        let path = UIBezierPath()
 
-        self.color.setFill()
-        path.fill()
+        for offset in offsets {
+            let shapeBottomLeftCorner = self.leftTopCornerOfCentralSymbol
+                .offsetBy(dx: 0, dy: self.symbolHeight + offset)
+            path.move(to: shapeBottomLeftCorner)
+
+            let shapeTopRightCorner = self.leftTopCornerOfCentralSymbol
+                .offsetBy(dx: self.symbolWidth, dy: offset)
+            let topLeftControlPoint = self.leftTopCornerOfCentralSymbol
+                .offsetBy(dx: 0, dy: -self.symbolHeight / 2 + offset)
+            let topRightControlPoint = self.leftTopCornerOfCentralSymbol
+                .offsetBy(dx: self.symbolWidth * 3 / 4, dy: self.symbolHeight / 2 + offset)
+            path.addCurve(to: shapeTopRightCorner, controlPoint1: topLeftControlPoint, controlPoint2: topRightControlPoint)
+
+            let bottomRightControlPoint = self.leftTopCornerOfCentralSymbol
+                .offsetBy(dx: self.symbolWidth, dy: self.symbolHeight * 1.5 + offset)
+            let bottomLeftControlPoint = self.leftTopCornerOfCentralSymbol
+                .offsetBy(dx: self.symbolWidth * 1 / 4, dy: symbolHeight / 2 + offset)
+            path.addCurve(to: shapeBottomLeftCorner, controlPoint1: bottomRightControlPoint, controlPoint2: bottomLeftControlPoint)
+            path.close()
+        }
+
+        applyShade(for: path)
+    }
+
+    private func applyShade(for path: UIBezierPath) {
+        switch self.shade {
+        case .open:
+            self.color.setStroke()
+            path.stroke()
+        case .striped:
+            path.addClip()
+            drawVerticalStripes()
+            self.color.setStroke()
+            path.stroke()
+        case .solid:
+            self.color.setFill()
+            path.fill()
+        }
+    }
+}
+
+private extension Card {
+
+    func getColor() -> UIColor {
+        switch self.color {
+        case .red:
+            return .systemRed
+        case .green:
+            return .systemGreen
+        case .purple:
+            return .systemPurple
+        }
     }
 
 }
@@ -96,6 +172,7 @@ extension CardButton {
         static let widthRatio = 0.6
         static let heightRatio = 0.23
         static let offsetRatio = 0.15
+        static let cornerRadiusRatio = 0.1
     }
 
     private var symbolWidth: CGFloat {
@@ -114,8 +191,13 @@ extension CardButton {
         .init(width: self.symbolWidth, height: self.symbolHeight)
     }
 
-    private var cardCenter: CGPoint {
+    private var cornerRadius: CGFloat {
+        self.bounds.size.width * SizeRatio.cornerRadiusRatio
+    }
+
+    private var leftTopCornerOfCentralSymbol: CGPoint {
         .init(x: self.bounds.midX, y: self.bounds.midY)
+        .offsetBy(dx: -self.symbolWidth / 2, dy: -self.symbolHeight / 2)
     }
 
     private func getVerticalCenterOffsets(for number: Card.Number) -> Array<CGFloat> {
