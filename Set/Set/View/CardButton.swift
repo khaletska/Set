@@ -9,16 +9,36 @@ import UIKit
 
 final class CardButton: UIButton {
 
-    var color: UIColor = .clear
-    var shape: Card.Shape = .diamond
-    var number: Card.Number = .one
-    var shade: Card.Shade = .open
-    
+    private var color: UIColor
+    private var shape: Card.Shape
+    private var number: Card.Number
+    private var shade: Card.Shade
+    private var highlight: UIColor
+    var indexOnBoard: Int
+
+    init(card: Card, index: Int, highlight: UIColor, frame: CGRect) {
+        self.color = card.getColor()
+        self.shape = card.shape
+        self.number = card.number
+        self.shade = card.shade
+        self.indexOnBoard = index
+        self.highlight = highlight
+
+        super.init(frame: frame)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override func draw(_ rect: CGRect) {
-        let roundedRect = UIBezierPath(roundedRect: self.bounds, cornerRadius: 16.0)
+        let roundedRect = UIBezierPath(roundedRect: self.bounds, cornerRadius: self.cornerRadius)
         roundedRect.addClip()
         UIColor.white.setFill()
         roundedRect.fill()
+        highlight.setStroke()
+        roundedRect.lineWidth = 3
+        roundedRect.stroke()
 
         drawBezierPath()
     }
@@ -131,12 +151,28 @@ final class CardButton: UIButton {
     }
 }
 
+private extension Card {
+
+    func getColor() -> UIColor {
+        switch self.color {
+        case .red:
+            return .systemRed
+        case .green:
+            return .systemGreen
+        case .purple:
+            return .systemPurple
+        }
+    }
+
+}
+
 extension CardButton {
 
     private struct SizeRatio {
         static let widthRatio = 0.6
         static let heightRatio = 0.23
         static let offsetRatio = 0.15
+        static let cornerRadiusRatio = 0.1
     }
 
     private var symbolWidth: CGFloat {
@@ -153,6 +189,10 @@ extension CardButton {
 
     private var symbolSize: CGSize {
         .init(width: self.symbolWidth, height: self.symbolHeight)
+    }
+
+    private var cornerRadius: CGFloat {
+        self.bounds.size.width * SizeRatio.cornerRadiusRatio
     }
 
     private var leftTopCornerOfCentralSymbol: CGPoint {

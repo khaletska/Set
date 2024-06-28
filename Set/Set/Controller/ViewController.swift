@@ -10,7 +10,8 @@ import UIKit
 final class ViewController: UIViewController {
 
     private var game: SetGame!
-    @IBOutlet private var cardButtons: [CardButton]!
+    private var gridCalculator = Grid(layout: .aspectRatio(5 / 8))
+    @IBOutlet private weak var gridView: UIView!
     @IBOutlet private weak var drawThreeMoreCardsButton: UIButton!
     @IBOutlet private weak var newGameButton: UIButton!
     @IBOutlet private weak var scoreLabel: UILabel!
@@ -29,10 +30,8 @@ final class ViewController: UIViewController {
         startNewGame()
     }
 
-    @IBAction private func cardButtonTapped(_ button: CardButton) {
-        if let index = self.cardButtons.firstIndex(of: button) {
-            self.game.touchCard(index: index)
-        }
+    @objc private func cardButtonTapped(_ sender: CardButton) {
+        self.game.touchCard(indexOnBoard: sender.indexOnBoard)
     }
 
     private func startNewGame() {
@@ -42,23 +41,30 @@ final class ViewController: UIViewController {
     }
 
     private func updateUI() {
-        for (index, button) in self.cardButtons.enumerated() {
-            if let card = self.game.getCard(for: index) {
-                button.color = card.getColor()
-                button.shape = card.shape
-                button.number = card.number
-                button.shade = card.shade
-                button.configuration?.background.strokeColor = getCardHighlightColor(for: index)
-                button.configuration?.background.strokeWidth = 3
-                button.isHidden = false
-            }
-            else {
-                button.isHidden = true
-            }
-        }
+        updateGrid(with: self.game.shownCards.compactMap { $0 })
 
         self.scoreLabel.text = "Score: \(self.game.score)"
         self.drawThreeMoreCardsButton.isEnabled = self.game.canDrawCards
+    }
+
+    private func updateGrid(with cards: [Card]) {
+        self.gridView.subviews.forEach { $0.removeFromSuperview() }
+        self.gridCalculator.cellCount = cards.count
+        self.gridCalculator.frame = self.gridView.bounds
+
+        for (index, card) in cards.enumerated() {
+            guard let frame = self.gridCalculator[index] else {
+                continue
+            }
+
+            let cardButtonView = CardButton(card: card,
+                                            index: index,
+                                            highlight: getCardHighlightColor(for: index),
+                                            frame: frame)
+            self.gridView.addSubview(cardButtonView)
+
+            cardButtonView.addTarget(self, action: #selector(cardButtonTapped(_:)), for: .touchUpInside)
+        }
     }
 
     private func getCardHighlightColor(for index: Int) -> UIColor {
@@ -73,28 +79,12 @@ final class ViewController: UIViewController {
             return .clear
         }
     }
-
 }
 
 extension ViewController: SetGameDelegate {
 
     func gameDidChange() {
         updateUI()
-    }
-
-}
-
-private extension Card {
-
-    func getColor() -> UIColor {
-        switch self.color {
-        case .red:
-            return .systemRed
-        case .green:
-            return .systemGreen
-        case .purple:
-            return .systemPurple
-        }
     }
 
 }
