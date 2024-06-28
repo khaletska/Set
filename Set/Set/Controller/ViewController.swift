@@ -30,9 +30,9 @@ final class ViewController: UIViewController {
     }
 
     private func cardButtonTapped(_ index: Int) {
-        if (self.game.shownCards[index] != nil) {
-            self.game.touchCard(index: index)
-        }
+//        if (self.game.shownCards.compactMap { $0 }[index] != nil) {
+            self.game.touchCard(indexOnBoard: index)
+//        }
     }
 
     private func startNewGame() {
@@ -50,8 +50,7 @@ final class ViewController: UIViewController {
     }
 
     private func updateUI() {
-        self.gridView.add(self.game.shownCards)
-
+        self.gridView.add(self.game.shownCards.compactMap { $0 })
 
         self.scoreLabel.text = "Score: \(self.game.score)"
         self.drawThreeMoreCardsButton.isEnabled = self.game.canDrawCards

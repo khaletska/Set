@@ -13,16 +13,14 @@ class GridView: UIView {
     var cardButtonTappedHandler: ((Int) -> Void)?
     var getCardHighlightColorForCard: ((Int) -> UIColor)?
 
-    func add(_ cards: [Card?]) {
+    func add(_ cards: [Card]) {
 
         self.subviews.forEach { $0.removeFromSuperview() }
-
-        self.calculator.cellCount = cards.compactMap { $0 }.count
+        self.calculator.cellCount = cards.count
         self.calculator.frame = self.bounds
 
         for (index, card) in cards.enumerated() {
-            guard let card = card,
-                  let frame = self.calculator[index] else {
+            guard let frame = self.calculator[index] else {
                 continue
             }
 
