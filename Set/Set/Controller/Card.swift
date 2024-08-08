@@ -12,6 +12,7 @@ struct Card {
     let shade: Shade
     let shape: Shape
     let number: Number
+    let id: Int
 
     enum Color: CaseIterable, Hashable {
         case red, green, purple
